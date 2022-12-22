@@ -16,14 +16,8 @@
     <cargoProject FILE="$PROJECT_DIR$/crates/json-event-parser/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="387c8314-5d38-48d7-ada3-caf858fd7ac6" name="Changes" comment="json reader writerが動いた">
+    <list default="true" id="387c8314-5d38-48d7-ada3-caf858fd7ac6" name="Changes" comment="コマンドが一旦完成した">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/json-event-parser/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/json-event-parser/src/lib.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/json-event-parser/src/read.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/json-event-parser/src/read.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/json-event-parser/src/write.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/json-event-parser/src/write.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,7 +187,7 @@
       <updated>1671539607490</updated>
       <workItem from="1671539608577" duration="13100000" />
       <workItem from="1671713920650" duration="7463000" />
-      <workItem from="1671721504597" duration="6125000" />
+      <workItem from="1671721504597" duration="6211000" />
     </task>
     <task id="LOCAL-00001" summary="一旦コミット">
       <created>1671550535644</created>
@@ -209,7 +203,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671721117123</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="コマンドが一旦完成した">
+      <created>1671728692255</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1671728692255</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -229,7 +230,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="一旦コミット" />
     <MESSAGE value="json reader writerが動いた" />
-    <option name="LAST_COMMIT_MESSAGE" value="json reader writerが動いた" />
+    <MESSAGE value="コマンドが一旦完成した" />
+    <option name="LAST_COMMIT_MESSAGE" value="コマンドが一旦完成した" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

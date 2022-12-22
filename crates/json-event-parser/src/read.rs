@@ -1,6 +1,9 @@
+#![allow(dead_code)]
+
 use crate::event::JsonEvent;
 use anyhow::{anyhow, Result};
 use std::borrow::Cow;
+use std::collections::VecDeque;
 use std::io::{BufRead, Error, ErrorKind, Seek, SeekFrom};
 use std::str;
 
@@ -26,13 +29,13 @@ use std::str;
 ///
 /// # std::io::Result::Ok(())
 /// ```
+#[allow(dead_code)]
 pub struct JsonReader<R: BufRead + Seek> {
     reader: R,
     state_stack: Vec<JsonState>,
     element_read: bool,
-    remain_events: Vec<JsonEvent<'static>>,
+    remain_events: VecDeque<JsonEvent<'static>>,
     max_stack_size: Option<usize>,
-    parse_with_white_space: bool,
 }
 
 impl<R: BufRead + Seek> JsonReader<R> {
@@ -42,8 +45,7 @@ impl<R: BufRead + Seek> JsonReader<R> {
             state_stack: Vec::new(),
             element_read: false,
             max_stack_size: None,
-            parse_with_white_space: true,
-            remain_events: Vec::new(),
+            remain_events: VecDeque::new(),
         }
     }
 
@@ -54,6 +56,10 @@ impl<R: BufRead + Seek> JsonReader<R> {
     }
 
     pub fn read_event<'a>(&mut self, buffer: &'a mut Vec<u8>) -> Result<JsonEvent<'a>> {
+        if let Some(ev) = self.remain_events.pop_front() {
+            return Ok(ev);
+        }
+
         match self.lookup_front_segment_whitespaces(buffer)? {
             SkipWhitespace::EmptyBuffer => {
                 if self.state_stack.is_empty() && self.element_read {
@@ -96,7 +102,7 @@ impl<R: BufRead + Seek> JsonReader<R> {
                         self.state_stack.pop(),
                         Some(JsonState::FirstArray) | Some(JsonState::LastArray)
                     ) {
-                        self.read_after_value(JsonEvent::EndObject, buffer)
+                        self.read_after_value(JsonEvent::EndArray, buffer)
                     } else {
                         Err(anyhow!(Error::new(
                             ErrorKind::InvalidData,
@@ -125,6 +131,7 @@ impl<R: BufRead + Seek> JsonReader<R> {
         self.reader.consume(1);
 
         #[derive(Eq, PartialEq, Copy, Clone)]
+        #[allow(dead_code)]
         enum StringState {
             Default,
             Escape,
@@ -392,17 +399,31 @@ impl<R: BufRead + Seek> JsonReader<R> {
             ..
         } = self;
 
-        let mut skip_with_match =
-            |skip_whitespace, match_func: Box<dyn FnOnce(u8) -> Result<JsonEvent<'a>>>| {
+        type SkipMatchValue<'a> = (JsonEvent<'a>, bool, Option<JsonEvent<'static>>);
+        let mut skip_with_match_before =
+            |skip_whitespace,
+             match_func: Box<dyn FnOnce(Option<u8>) -> Result<SkipMatchValue<'a>>>| {
                 match skip_whitespace {
                     SkipWhitespace::NoSkip(front) => {
-                        let event = match_func(front)?;
+                        let (event, _, next) = match_func(Some(front))?;
+                        if let Some(next) = next {
+                            remain_events.push_back(next)
+                        }
                         Ok(event)
                     }
                     SkipWhitespace::Skip(whitespace, front) => {
-                        let event = match_func(front)?;
-                        remain_events.push(event.into_owned());
-                        Ok(JsonEvent::WhiteSpace(whitespace))
+                        let (event, is_before, next) = match_func(front)?;
+
+                        if is_before {
+                            remain_events.push_back(event.into_owned());
+                            Ok(JsonEvent::WhiteSpace(whitespace))
+                        } else {
+                            remain_events.push_back(JsonEvent::WhiteSpace(whitespace));
+                            if let Some(next) = next {
+                                remain_events.push_back(next)
+                            }
+                            Ok(event.into_owned())
+                        }
                     }
                     SkipWhitespace::EmptyBuffer => Err(anyhow!(Error::new(
                         ErrorKind::UnexpectedEof,
@@ -413,14 +434,14 @@ impl<R: BufRead + Seek> JsonReader<R> {
 
         match self.state_stack.pop() {
             Some(JsonState::FirstObjectKey) | Some(JsonState::NextObjectKey) => {
-                skip_with_match(
+                skip_with_match_before(
                     lookup_front_segment_whitespaces_impl(reader, buffer)?,
                     Box::new(|front| {
-                        if front == b':' {
+                        if front == Some(b':') {
                             self.reader.consume(1);
                             self.state_stack.push(JsonState::ObjectValue);
                             if let JsonEvent::String(value) = value {
-                                Ok(JsonEvent::ObjectKey(value))
+                                Ok((JsonEvent::ObjectKey(value), true, None))
                             } else {
                                 Err(anyhow!(Error::new(
                                     ErrorKind::InvalidData,
@@ -435,77 +456,43 @@ impl<R: BufRead + Seek> JsonReader<R> {
                         }
                     }),
                 )
-                // match self.lookup_front_segment_whitespaces()? {
-                //     SkipWhitespace::NoSkip(b':') => {
-                //         self.reader.consume(1);
-                //         self.state_stack.push(JsonState::ObjectValue);
-                //         if let JsonEvent::String(value) = value {
-                //             Ok((JsonEvent::ObjectKey(value), None))
-                //         } else {
-                //             Err(anyhow!(Error::new(
-                //                 ErrorKind::InvalidData,
-                //                 "Object keys should strings",
-                //             )))
-                //         }
-                //     }
-                //     SkipWhitespace::Skip(whitespace, front) => {
-                //         let front = self.lookup_front()?;
-                //         if let Some(c) = front {
-                //             if c == b':' {
-                //                 self.reader.consume(1);
-                //                 self.state_stack.push(JsonState::ObjectValue);
-                //                 if let JsonEvent::String(value) = value {
-                //                     Ok((
-                //                         JsonEvent::WhiteSpace(whitespace),
-                //                         Some(JsonEvent::ObjectKey(value)),
-                //                     ))
-                //                 } else {
-                //                     Err(anyhow!(Error::new(
-                //                         ErrorKind::InvalidData,
-                //                         "Object keys should strings",
-                //                     )))
-                //                 }
-                //             }
-                //         }
-                //     }
-                //     _ => Err(anyhow!(Error::new(
-                //         ErrorKind::InvalidData,
-                //         "Object keys should be followed by ':'",
-                //     ))),
-                // }
             }
-            Some(JsonState::ObjectValue) => match self.lookup_front_segment_whitespaces()? {
-                Some(b',') => {
-                    self.reader.consume(1);
-                    self.state_stack.push(JsonState::NextObjectKey);
-                    Ok(value)
-                }
-                Some(b'}') => {
-                    self.state_stack.push(JsonState::LastObjectKey);
-                    Ok(value)
-                }
-                _ => Err(anyhow!(Error::new(
-                    ErrorKind::InvalidData,
-                    "Object values should be followed by a comma or the object end",
-                ))),
-            },
-            // Some(JsonState::FirstArray) | Some(JsonState::NextArray) => {
-            //     match self.lookup_front_segment_whitespaces()? {
-            //         Some(b',') => {
-            //             self.reader.consume(1);
-            //             self.state_stack.push(JsonState::NextArray);
-            //             Ok(value)
-            //         }
-            //         Some(b']') => {
-            //             self.state_stack.push(JsonState::LastArray);
-            //             Ok(value)
-            //         }
-            //         _ => Err(anyhow!(Error::new(
-            //             ErrorKind::InvalidData,
-            //             "Array values should be followed by a comma or the array end",
-            //         ))),
-            //     }
-            // }
+            Some(JsonState::ObjectValue) => skip_with_match_before(
+                lookup_front_segment_whitespaces_impl(reader, buffer)?,
+                Box::new(|front| match front {
+                    Some(b',') => {
+                        self.reader.consume(1);
+                        self.state_stack.push(JsonState::NextObjectKey);
+                        Ok((value, false, Some(JsonEvent::NextObjectValue)))
+                    }
+                    Some(b'}') => {
+                        self.state_stack.push(JsonState::LastObjectKey);
+                        Ok((value, false, None))
+                    }
+                    _ => Err(anyhow!(Error::new(
+                        ErrorKind::InvalidData,
+                        "Object values should be followed by ',' or '}'",
+                    ))),
+                }),
+            ),
+            Some(JsonState::FirstArray) | Some(JsonState::NextArray) => skip_with_match_before(
+                lookup_front_segment_whitespaces_impl(reader, buffer)?,
+                Box::new(|front| match front {
+                    Some(b',') => {
+                        self.reader.consume(1);
+                        self.state_stack.push(JsonState::NextArray);
+                        Ok((value, false, Some(JsonEvent::NextArrayValue)))
+                    }
+                    Some(b']') => {
+                        self.state_stack.push(JsonState::LastArray);
+                        Ok((value, false, None))
+                    }
+                    _ => Err(anyhow!(Error::new(
+                        ErrorKind::InvalidData,
+                        "Array values should be followed by ',' or ']'",
+                    ))),
+                }),
+            ),
             None => {
                 if self.element_read {
                     Err(anyhow!(Error::new(
@@ -601,7 +588,8 @@ impl<R: BufRead + Seek> JsonReader<R> {
     }
 }
 
-#[derive(Eq, PartialEq, Copy, Clone)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+#[allow(dead_code)]
 enum JsonState {
     FirstArray,
     NextArray,
@@ -612,6 +600,7 @@ enum JsonState {
     ObjectValue,
 }
 
+#[allow(dead_code)]
 fn skip_whitespaces(buf: &[u8]) -> usize {
     for (i, c) in buf.iter().enumerate() {
         if !matches!(c, b' ' | b'\t' | b'\n' | b'\r') {
@@ -620,7 +609,6 @@ fn skip_whitespaces(buf: &[u8]) -> usize {
     }
     buf.len()
 }
-
 fn read_hexa_char(input: &[u8]) -> Result<u32> {
     let mut value = 0;
     for c in input.iter().copied() {
@@ -649,7 +637,14 @@ fn lookup_front_segment_whitespaces_impl<R: BufRead + Seek>(
         match reader.fill_buf() {
             Ok(buf) => {
                 if buf.is_empty() {
-                    return Ok(SkipWhitespace::EmptyBuffer);
+                    return if output.is_empty() {
+                        Ok(SkipWhitespace::EmptyBuffer)
+                    } else {
+                        Ok(SkipWhitespace::Skip(
+                            String::from_utf8(output.clone())?,
+                            None,
+                        ))
+                    };
                 }
                 let skipped = skip_whitespaces(buf);
                 if skipped == buf.len() {
@@ -663,7 +658,10 @@ fn lookup_front_segment_whitespaces_impl<R: BufRead + Seek>(
                     return if output.is_empty() {
                         Ok(SkipWhitespace::NoSkip(c))
                     } else {
-                        Ok(SkipWhitespace::Skip(String::from_utf8(output.clone())?, c))
+                        Ok(SkipWhitespace::Skip(
+                            String::from_utf8(output.clone())?,
+                            Some(c),
+                        ))
                     };
                 }
             }
@@ -679,13 +677,12 @@ fn lookup_front_segment_whitespaces_impl<R: BufRead + Seek>(
 enum SkipWhitespace {
     EmptyBuffer,
     NoSkip(u8),
-    Skip(String, u8),
+    Skip(String, Option<u8>),
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs::read;
     use std::io::{BufReader, Cursor};
 
     #[test]
@@ -694,7 +691,7 @@ mod tests {
     "nadeko": "cute",
     "sumire": "cute",
     "number": 1234,
-    "numbers": [1, 2, 3],
+    "numbers": [1, 2, 3]
 }"#
         .to_string();
 

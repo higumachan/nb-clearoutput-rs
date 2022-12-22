@@ -30,7 +30,7 @@ use std::str;
 /// # std::io::Result::Ok(())
 /// ```
 #[allow(dead_code)]
-pub struct JsonReader<R: BufRead + Seek> {
+pub struct JsonReader<R> {
     reader: R,
     state_stack: Vec<JsonState>,
     element_read: bool,

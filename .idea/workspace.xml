@@ -16,13 +16,14 @@
     <cargoProject FILE="$PROJECT_DIR$/crates/json-event-parser/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="387c8314-5d38-48d7-ada3-caf858fd7ac6" name="Changes" comment="一旦コミット">
-      <change afterPath="$PROJECT_DIR$/crates/json-event-parser/src/write.rs" afterDir="false" />
+    <list default="true" id="387c8314-5d38-48d7-ada3-caf858fd7ac6" name="Changes" comment="json reader writerが動いた">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/json-event-parser/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/crates/json-event-parser/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crates/json-event-parser/src/event.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/json-event-parser/src/event.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crates/json-event-parser/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/json-event-parser/src/lib.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crates/json-event-parser/src/read.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/json-event-parser/src/read.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crates/json-event-parser/src/write.rs" beforeDir="false" afterPath="$PROJECT_DIR$/crates/json-event-parser/src/write.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,15 +63,37 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "last_opened_file_path": "/Users/yuta/ghq/github.com/higumachan/nb-clearoutput-rs",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
-    "settings.editor.selected.configurable": "language.rust.cargo.check"
+    "settings.editor.selected.configurable": "language.rust.cargo.check",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Cargo.Clippy">
+  <component name="RunManager" selected="Cargo.Run nb-clearoutput-rs">
     <configuration name="Clippy" type="CargoCommandRunConfiguration" factoryName="Cargo Command" nameIsGenerated="true">
       <option name="command" value="clippy" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$/crates/json-event-parser" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Run nb-clearoutput-rs" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="run --package nb-clearoutput-rs --bin nb-clearoutput-rs -- stdout assets/notebook/sample.ipynb" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <option name="channel" value="DEFAULT" />
       <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
@@ -138,15 +161,15 @@
     </configuration>
     <list>
       <item itemvalue="Cargo.Clippy" />
+      <item itemvalue="Cargo.Run nb-clearoutput-rs" />
       <item itemvalue="Cargo.Test read::tests" />
       <item itemvalue="Cargo.Test read::tests::it_works" />
       <item itemvalue="Cargo.Test write::tests" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Run nb-clearoutput-rs" />
         <item itemvalue="Cargo.Test write::tests" />
-        <item itemvalue="Cargo.Test read::tests" />
-        <item itemvalue="Cargo.Test read::tests::it_works" />
       </list>
     </recent_temporary>
   </component>
@@ -169,7 +192,8 @@
       <option name="presentableId" value="Default" />
       <updated>1671539607490</updated>
       <workItem from="1671539608577" duration="13100000" />
-      <workItem from="1671713920650" duration="7170000" />
+      <workItem from="1671713920650" duration="7463000" />
+      <workItem from="1671721504597" duration="6125000" />
     </task>
     <task id="LOCAL-00001" summary="一旦コミット">
       <created>1671550535644</created>
@@ -178,7 +202,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671550535644</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="json reader writerが動いた">
+      <created>1671721117123</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1671721117123</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -197,7 +228,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="一旦コミット" />
-    <option name="LAST_COMMIT_MESSAGE" value="一旦コミット" />
+    <MESSAGE value="json reader writerが動いた" />
+    <option name="LAST_COMMIT_MESSAGE" value="json reader writerが動いた" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

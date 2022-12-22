@@ -2,6 +2,7 @@
 
 use crate::event::JsonEvent;
 use anyhow::Result;
+use std::borrow::Borrow;
 use std::io::Write;
 
 pub struct JsonWriter<W: Write> {
@@ -19,9 +20,7 @@ impl<W: Write> JsonWriter<W> {
                 self.writer.write_all(whitespace.as_bytes())?;
             }
             JsonEvent::String(string) => {
-                self.writer.write_all(b"\"")?;
-                self.writer.write_all(string.as_bytes())?;
-                self.writer.write_all(b"\"")?;
+                write_escaped_json_string(string.borrow(), &mut self.writer)?;
             }
             JsonEvent::Number(number) => {
                 self.writer.write_all(number.as_bytes())?;
@@ -43,9 +42,8 @@ impl<W: Write> JsonWriter<W> {
                 self.writer.write_all(b"}")?;
             }
             JsonEvent::ObjectKey(key) => {
-                self.writer.write_all(b"\"")?;
-                self.writer.write_all(key.as_bytes())?;
-                self.writer.write_all(b"\":")?;
+                write_escaped_json_string(key.borrow(), &mut self.writer)?;
+                self.writer.write_all(b":")?;
             }
             JsonEvent::StartArray => {
                 self.writer.write_all(b"[")?;
@@ -62,20 +60,56 @@ impl<W: Write> JsonWriter<W> {
     }
 }
 
+fn write_escaped_json_string(s: &str, sink: &mut impl Write) -> Result<()> {
+    sink.write_all(b"\"")?;
+    let mut buffer = [b'\\', b'u', 0, 0, 0, 0];
+    for c in s.chars() {
+        match c {
+            '\\' => sink.write_all(b"\\\\"),
+            '"' => sink.write_all(b"\\\""),
+            c => {
+                if c < char::from(32) {
+                    match c {
+                        '\u{08}' => sink.write_all(b"\\b"),
+                        '\u{0C}' => sink.write_all(b"\\f"),
+                        '\n' => sink.write_all(b"\\n"),
+                        '\r' => sink.write_all(b"\\r"),
+                        '\t' => sink.write_all(b"\\t"),
+                        c => {
+                            let mut c = c as u8;
+                            for i in (2..6).rev() {
+                                let ch = c % 16;
+                                buffer[i] = ch + if ch < 10 { b'0' } else { b'A' };
+                                c /= 16;
+                            }
+                            sink.write_all(&buffer)
+                        }
+                    }
+                } else {
+                    sink.write_all(c.encode_utf8(&mut buffer[2..]).as_bytes())
+                }
+            }
+        }?;
+    }
+    sink.write_all(b"\"")?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::read::JsonReader;
     use rstest::rstest;
     use std::borrow::Cow;
-    use std::io::{BufReader, Cursor};
+    use std::fs::File;
+    use std::io::{BufReader, Cursor, Read};
 
     fn write_events(events: Vec<JsonEvent>) -> String {
         let mut buffer = Vec::new();
         {
             let mut writer = JsonWriter::from_writer(&mut buffer);
             for event in events {
-                writer.write_all_event(event).unwrap();
+                writer.write_event(event).unwrap();
             }
         }
 
@@ -129,11 +163,39 @@ mod tests {
                 if event == JsonEvent::Eof {
                     break;
                 }
-                writer.write_all_event(event).unwrap();
+                writer.write_event(event).unwrap();
             }
         }
         let output_json_str = String::from_utf8(output_json_buffer).unwrap();
 
         assert_eq!(output_json_str, json_str);
+    }
+
+    #[test]
+    fn read_and_write_realcase() {
+        let mut buf = String::new();
+        File::open("assets/notebook/sample.ipynb")
+            .unwrap()
+            .read_to_string(&mut buf)
+            .unwrap();
+
+        let mut reader = JsonReader::from_reader(BufReader::new(Cursor::new(buf.as_bytes())));
+        let mut output_json_buffer = vec![];
+        {
+            let mut writer = JsonWriter::from_writer(&mut output_json_buffer);
+
+            let mut buffer = vec![];
+            loop {
+                let event = reader.read_event(&mut buffer).unwrap();
+                dbg!(&event);
+                if event == JsonEvent::Eof {
+                    break;
+                }
+                writer.write_event(event).unwrap();
+            }
+        }
+        let output_json_str = String::from_utf8(output_json_buffer).unwrap();
+
+        assert_eq!(output_json_str, buf);
     }
 }

@@ -96,7 +96,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "json-event-parser",
+ "json-event-parser-witespace 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -232,11 +232,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "json-event-parser"
+name = "json-event-parser-witespace"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "rstest",
+ "smallvec",
+]
+
+[[package]]
+name = "json-event-parser-witespace"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43ade1c3e777d4391a13f9a716c8adf38da2fd59dada638c197560cf0ba2906f"
+dependencies = [
+ "anyhow",
  "smallvec",
 ]
 

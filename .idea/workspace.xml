@@ -13,11 +13,13 @@
   </component>
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
-    <cargoProject FILE="$PROJECT_DIR$/crates/json-event-parser/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="387c8314-5d38-48d7-ada3-caf858fd7ac6" name="Changes" comment="コマンドが一旦完成した">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="387c8314-5d38-48d7-ada3-caf858fd7ac6" name="Changes" comment="update Cargo.toml">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +58,7 @@
     "WebServerToolWindowFactoryState": "false",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "last_opened_file_path": "/Users/yuta/ghq/github.com/higumachan/nb-clearoutput-rs",
+    "last_opened_file_path": "/Users/yuta/ghq/github.com/higumachan/nb-clearoutput-rs/crates/json-event-parser",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -67,6 +69,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/crates/json-event-parser" />
+    </key>
+  </component>
   <component name="RunManager" selected="Cargo.Run nb-clearoutput-rs">
     <configuration name="Clippy" type="CargoCommandRunConfiguration" factoryName="Cargo Command" nameIsGenerated="true">
       <option name="command" value="clippy" />
@@ -187,7 +194,9 @@
       <updated>1671539607490</updated>
       <workItem from="1671539608577" duration="13100000" />
       <workItem from="1671713920650" duration="7463000" />
-      <workItem from="1671721504597" duration="6211000" />
+      <workItem from="1671721504597" duration="7564000" />
+      <workItem from="1671783198946" duration="4211000" />
+      <workItem from="1672482818853" duration="5503000" />
     </task>
     <task id="LOCAL-00001" summary="一旦コミット">
       <created>1671550535644</created>
@@ -210,7 +219,56 @@
       <option name="project" value="LOCAL" />
       <updated>1671728692255</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="軽微な修正">
+      <created>1671728761744</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1671728761744</updated>
+    </task>
+    <task id="LOCAL-00005" summary="細かい修正周りの不具合を直した">
+      <created>1672495554384</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1672495554384</updated>
+    </task>
+    <task id="LOCAL-00006" summary="update CI">
+      <created>1672496964254</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1672496964254</updated>
+    </task>
+    <task id="LOCAL-00007" summary="update">
+      <created>1672497138809</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1672497138809</updated>
+    </task>
+    <task id="LOCAL-00008" summary="add license">
+      <created>1672497785191</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1672497785191</updated>
+    </task>
+    <task id="LOCAL-00009" summary="update Cargo.toml">
+      <created>1672498014360</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1672498014360</updated>
+    </task>
+    <task id="LOCAL-00010" summary="update Cargo.toml">
+      <created>1672498075355</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1672498075355</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -231,7 +289,13 @@
     <MESSAGE value="一旦コミット" />
     <MESSAGE value="json reader writerが動いた" />
     <MESSAGE value="コマンドが一旦完成した" />
-    <option name="LAST_COMMIT_MESSAGE" value="コマンドが一旦完成した" />
+    <MESSAGE value="軽微な修正" />
+    <MESSAGE value="細かい修正周りの不具合を直した" />
+    <MESSAGE value="update CI" />
+    <MESSAGE value="update" />
+    <MESSAGE value="add license" />
+    <MESSAGE value="update Cargo.toml" />
+    <option name="LAST_COMMIT_MESSAGE" value="update Cargo.toml" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

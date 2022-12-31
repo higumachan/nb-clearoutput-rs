@@ -7,28 +7,6 @@ use std::collections::VecDeque;
 use std::io::{BufRead, Error, ErrorKind, Seek, SeekFrom};
 use std::str;
 
-/// A simple JSON streaming parser.
-///
-/// Does not allocate except a stack to check if array and object opening and closing are properly nested.
-/// This stack size might be limited using the method [`max_stack_size`](JsonReader::max_stack_size).
-///
-/// Example:
-/// ```rust
-/// use json_event_parser::{JsonReader, JsonEvent};
-/// use std::io::Cursor;
-///
-/// let json = b"{\"foo\": 1}";
-/// let mut reader = JsonReader::from_reader(Cursor::new(json));
-///
-/// let mut buffer = Vec::new();
-/// assert_eq!(JsonEvent::StartObject, reader.read_event(&mut buffer)?);
-/// assert_eq!(JsonEvent::ObjectKey("foo"), reader.read_event(&mut buffer)?);
-/// assert_eq!(JsonEvent::Number("1"), reader.read_event(&mut buffer)?);
-/// assert_eq!(JsonEvent::EndObject, reader.read_event(&mut buffer)?);
-/// assert_eq!(JsonEvent::Eof, reader.read_event(&mut buffer)?);
-///
-/// # std::io::Result::Ok(())
-/// ```
 #[allow(dead_code)]
 pub struct JsonReader<R> {
     reader: R,

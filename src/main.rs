@@ -26,16 +26,30 @@ enum State {
     Outputs,
     OutputsArrayStart,
     OutputsArrayEnd,
+    ExecutionCount,
+    MetaData,
+    Collapsed,
+}
+
+fn flush_events<'a>(
+    skip: bool,
+    writer: &mut JsonWriter<Box<dyn Write>>,
+    spaces: &mut Vec<String>,
+    event: &JsonEvent<'a>,
+) -> anyhow::Result<()> {
+    if !skip {
+        for space in std::mem::take(spaces) {
+            writer.write_event(JsonEvent::WhiteSpace(space))?;
+        }
+        writer.write_event(event.to_owned())?;
+    } else {
+        spaces.clear();
+    }
+    Ok(())
 }
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-
-    println!(
-        "Hello, world! {:?} {}",
-        args.output,
-        args.input_file.to_string_lossy()
-    );
 
     let file_reader = BufReader::new(File::open(&args.input_file)?);
     let mut json_reader: JsonReader<BufReader<File>> = JsonReader::from_reader(file_reader);
@@ -49,24 +63,48 @@ fn main() -> anyhow::Result<()> {
     let mut state = State::Root;
     let mut stack = 0;
     let mut skip = false;
+    let mut save_spaces = vec![];
 
     loop {
-        let event: JsonEvent = json_reader.read_event(&mut buffer)?;
+        let event: JsonEvent = json_reader.read_event(&mut buffer)?.to_owned();
 
         if event == JsonEvent::Eof {
             break;
         }
 
-        if let (State::OutputsArrayStart, JsonEvent::EndArray) = (state, &event) {
-            stack -= 1;
-            if stack == 0 {
+        match (state, &event) {
+            (State::OutputsArrayStart, JsonEvent::EndArray) => {
+                stack -= 1;
+                if stack == 0 {
+                    state = State::OutputsArrayEnd;
+                    skip = false;
+                }
+                save_spaces.clear();
+                flush_events(skip, &mut writer, &mut save_spaces, &event)?;
+            }
+            (State::ExecutionCount, JsonEvent::Number(_) | JsonEvent::Null) => {
                 state = State::OutputsArrayEnd;
                 skip = false;
+                flush_events(skip, &mut writer, &mut save_spaces, &JsonEvent::Null)?;
             }
-        }
-
-        if !skip {
-            writer.write_event(event.clone())?;
+            (State::MetaData, JsonEvent::EndObject) => {
+                state = State::OutputsArrayEnd;
+                flush_events(skip, &mut writer, &mut save_spaces, &event)?;
+            }
+            (State::Collapsed, JsonEvent::NextObjectValue) => {
+                state = State::MetaData;
+                skip = false;
+            }
+            (State::MetaData, JsonEvent::ObjectKey(key)) if key == "collapsed" => {
+                state = State::Collapsed;
+                skip = true;
+            }
+            (_, JsonEvent::WhiteSpace(space)) => {
+                save_spaces.push(space.clone());
+            }
+            _ => {
+                flush_events(skip, &mut writer, &mut save_spaces, &event)?;
+            }
         }
 
         match (state, event) {
@@ -81,6 +119,17 @@ fn main() -> anyhow::Result<()> {
             {
                 state = State::Outputs;
             }
+            (State::CellsArrayStart | State::OutputsArrayEnd, JsonEvent::ObjectKey(key))
+                if key == "execution_count" =>
+            {
+                state = State::ExecutionCount;
+                skip = true;
+            }
+            (State::CellsArrayStart | State::OutputsArrayEnd, JsonEvent::ObjectKey(key))
+                if key == "metadata" =>
+            {
+                state = State::MetaData;
+            }
             (State::Outputs, JsonEvent::StartArray) => {
                 state = State::OutputsArrayStart;
                 skip = true;
@@ -89,7 +138,6 @@ fn main() -> anyhow::Result<()> {
             (State::OutputsArrayStart, JsonEvent::StartArray) => {
                 stack += 1;
             }
-
             _ => {}
         }
     }

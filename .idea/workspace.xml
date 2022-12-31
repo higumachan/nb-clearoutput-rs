@@ -15,11 +15,8 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="387c8314-5d38-48d7-ada3-caf858fd7ac6" name="Changes" comment="update Cargo.toml">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    <list default="true" id="387c8314-5d38-48d7-ada3-caf858fd7ac6" name="Changes" comment="update README">
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -196,7 +193,7 @@
       <workItem from="1671713920650" duration="7463000" />
       <workItem from="1671721504597" duration="7564000" />
       <workItem from="1671783198946" duration="4211000" />
-      <workItem from="1672482818853" duration="5503000" />
+      <workItem from="1672482818853" duration="5613000" />
     </task>
     <task id="LOCAL-00001" summary="一旦コミット">
       <created>1671550535644</created>
@@ -268,7 +265,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672498075355</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="update README">
+      <created>1672498305781</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1672498305781</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -295,7 +299,8 @@
     <MESSAGE value="update" />
     <MESSAGE value="add license" />
     <MESSAGE value="update Cargo.toml" />
-    <option name="LAST_COMMIT_MESSAGE" value="update Cargo.toml" />
+    <MESSAGE value="update README" />
+    <option name="LAST_COMMIT_MESSAGE" value="update README" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

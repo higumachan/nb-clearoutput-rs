@@ -2,6 +2,8 @@
 name = "fast-notebook-clear-output"
 version = "0.1.0"
 edition = "2021"
+description = "A reasonably fast jupyter notebook clear output tool."
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -9,6 +11,10 @@ edition = "2021"
 members = [
     "crates/json-event-parser"
 ]
+
+[[bin]]
+name = "nbclo"
+path = "src/main.rs"
 
 [dependencies]
 clap = {version = "4.0.30", features = ["derive"]}

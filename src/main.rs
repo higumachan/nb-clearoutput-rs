@@ -1,5 +1,5 @@
 use clap::Parser;
-use json_event_parser::{JsonEvent, JsonReader, JsonWriter};
+use json_event_parser_witespace::{JsonEvent, JsonReader, JsonWriter};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Write};
 use std::path::PathBuf;
